@@ -18,3 +18,4 @@ Thumbs.db
 .vscode/
 
 # Ignore any other files specific to your environment
+/data/
