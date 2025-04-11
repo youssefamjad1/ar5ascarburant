@@ -1,0 +1,22 @@
+# Root-level gitignore
+
+# Node.js dependencies (for both backend and frontend)
+/frontend/node_modules/
+/backend/node_modules/
+
+# Logs
+*.log
+*.log.*
+
+# Other common files
+.env
+/dist/
+build/
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
+
+# Ignore any other files specific to your environment
+/data/
+node_modules
