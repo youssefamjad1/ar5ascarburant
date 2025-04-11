@@ -9,7 +9,8 @@ function StationListPage() {
     navigator.geolocation.getCurrentPosition((position) => {
       const { latitude, longitude } = position.coords;
 
-      axios.get(`http://localhost:5000/api/stations?lat=${latitude}&lng=${longitude}`)
+      // Use the correct API URL deployed on Vercel
+      axios.get(`https://ar5ascarburant-la3rktt00-youssefs-projects-81e32e79.vercel.app/api/stations?lat=${latitude}&lng=${longitude}`)
         .then(response => {
           setStations(response.data);
         })

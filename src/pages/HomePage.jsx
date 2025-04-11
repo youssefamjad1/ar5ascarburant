@@ -5,9 +5,10 @@ import axios from 'axios';
 import 'leaflet/dist/leaflet.css';
 import L from 'leaflet';
 import 'leaflet-routing-machine';
-import gasPump from '../assets/gas-pump.png'; // ✅ Correct icon import
+import gasPump from '../assets/gas-pump.png';
 
-// 📍 Custom Icons
+const API_URL = import.meta.env.VITE_API_URL;
+
 const stationIcon = new Icon({
   iconUrl: gasPump,
   iconSize: [30, 30],
@@ -25,7 +26,6 @@ const HomePage = () => {
   const [selectedStation, setSelectedStation] = useState(null);
   const [loading, setLoading] = useState(true);
 
-  // 🛰️ Get user location on mount
   useEffect(() => {
     navigator.geolocation.getCurrentPosition(
       (position) => {
@@ -47,16 +47,14 @@ const HomePage = () => {
     );
   }, []);
 
-  // ⛽ Fetch stations when userLocation is ready
   useEffect(() => {
     if (!userLocation) return;
 
     setLoading(true);
     const { lat, lng } = userLocation;
 
-    // Ensure lat and lng are being correctly passed as query params
     axios
-      .get('http://localhost:5000/api/stations', {
+      .get(`${API_URL}/api/stations`, {
         params: {
           lat: parseFloat(lat),
           lng: parseFloat(lng),
@@ -72,7 +70,6 @@ const HomePage = () => {
       });
   }, [userLocation]);
 
-  // 🧭 Routing component (draws route to selected station)
   const RoutingControl = ({ selectedStation, userLocation }) => {
     const map = useMap();
     const routeRef = useRef(null);
@@ -80,30 +77,28 @@ const HomePage = () => {
     useEffect(() => {
       if (!selectedStation || !userLocation) return;
 
-      // Safely remove any previously added route if it exists
       if (routeRef.current && routeRef.current._container) {
-        map.removeControl(routeRef.current);  // Safely remove old route control
+        map.removeControl(routeRef.current);
       }
 
-      // Create a new route control
       const newRoute = L.Routing.control({
         waypoints: [
           L.latLng(userLocation.lat, userLocation.lng),
-          L.latLng(selectedStation.location.coordinates[1], selectedStation.location.coordinates[0]),
+          L.latLng(
+            selectedStation.location.coordinates[1],
+            selectedStation.location.coordinates[0]
+          ),
         ],
         routeWhileDragging: true,
-        createMarker: () => null, // Remove the marker from the route
+        createMarker: () => null,
       }).addTo(map);
 
-      // Store the new route in the reference for future cleanup
       routeRef.current = newRoute;
 
-      // Fit the map bounds to the route
       if (newRoute.getBounds) {
         map.fitBounds(newRoute.getBounds());
       }
 
-      // Cleanup: remove the route when the component unmounts or when dependencies change
       return () => {
         if (routeRef.current && routeRef.current._container) {
           map.removeControl(routeRef.current);
